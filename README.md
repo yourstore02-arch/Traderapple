@@ -1,2 +1,0 @@
-# Traderapple
-Traderapple
