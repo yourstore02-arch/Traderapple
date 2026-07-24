@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Trade Analysis Engine v6.0 - Unified Long & Short Dashboard</title>
+<!-- Lightweight Charts v4.2.0 -->
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: #020617;
+    color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.container {
+    max-width: 1500px;
+    margin: auto;
+}
+
+.card {
+    background: #111827;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.35);
+    border: 1px solid #1e293b;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #60a5fa;
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Set font-size to 16px so iOS Safari won't force auto-zoom on field focus */
+input, select {
+    background: #020617;
+    color: white;
+    border: 1px solid #334155;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 16px; 
+    font-weight: bold;
+    outline: none;
+    min-height: 44px; /* Touch friendly size */
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+input:focus, select:focus {
+    border-color: #3b82f6;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    min-height: 44px;
+    font-size: 14px;
+    touch-action: manipulation;
+    transition: opacity .2s ease;
+}
+
+button:active {
+    opacity: .7;
+}
+
+.btn-primary { background: #2563eb; width: 100%; }
+.btn-purple  { background: #7c3aed; width: 100%; }
+.btn-buy     { background: #16a34a; width: 100%; margin-top: 12px; padding: 12px; font-size: 14px; }
+.btn-sell    { background: #dc2626; width: 100%; margin-top: 12px; padding: 12px; font-size: 14px; }
+.btn-neutral { background: #475569; width: 100%; margin-top: 12px; padding: 12px; font-size: 14px; }
+.btn-sm      { padding: 6px 12px; font-size: 12px; background: #3b82f6; min-height: 32px; width: auto; }
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 15px;
+}
+
+#chart {
+    height: 500px;
+    background: #020617;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.panel-title {
+    color: #94a3b8;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.metric {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e293b;
+    font-size: 13px;
+}
+
+.metric span:last-child {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: bold;
+}
+
+.green  { color: #4ade80; }
+.red    { color: #f87171; }
+.yellow { color: #facc15; }
+.blue   { color: #60a5fa; }
+.purple { color: #c084fc; }
+
+.score-box {
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: 8px;
+    background: #020617;
+    border-left: 4px solid #2563eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score {
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.reasoning-box {
+    background: #020617;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    border-left: 3px solid #3b82f6;
+}
+
+.reasoning-list {
+    list-style: none;
+    font-size: 12px;
+    color: #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.screener-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.screener-results {
+    width: 100%;
+    min-width: 500px;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.screener-results th {
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #334155;
+    padding: 8px;
+    text-align: left;
+}
+
+.screener-results td {
+    padding: 8px;
+    font-size: 12px;
+    border-bottom: 1px solid #1e293b;
+}
+
+/* Mobile Breakpoints for iPhone */
+@media (max-width: 800px) {
+    .dashboard { 
+        grid-template-columns: 1fr; 
+    }
+    #chart { 
+        height: 380px; 
+    }
+    .controls {
+        grid-template-columns: 1fr 1fr;
+    }
+    .field-full-mobile {
+        grid-column: span 2;
+    }
+    .title {
+        font-size: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="card header">
+        <div>
+            <div class="title">📈 Trade Analysis Engine v6.0</div>
+            <div class="subtitle">Unified AI Technical Analysis • Risk Engine • Order Staging</div>
+        </div>
+    </div>
+
+    <!-- Main Controls Card -->
+    <div class="card">
+        <div class="controls">
+            <div class="field">
+                <label>TICKER</label>
+                <input id="ticker" value="NVDA" style="text-transform:uppercase;">
+            </div>
+            <div class="field">
+                <label>TIMEFRAME</label>
+                <select id="timeframe">
+                    <option value="1d">Daily</option>
+                    <option value="1h">Hourly</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>PORTFOLIO ($)</label>
+                <input id="account" type="number" value="25000">
+            </div>
+            <div class="field">
+                <label>RISK (%)</label>
+                <input id="risk" type="number" value="1.0" step="0.1">
+            </div>
+            <div class="field field-full-mobile">
+                <label>MAX POSITION (%)</label>
+                <input id="maxPosition" type="number" value="20">
+            </div>
+            <div class="field field-full-mobile">
+                <button class="btn-primary" onclick="runEngine()">ANALYZE TICKER</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px; border-top: 1px solid #1e293b; padding-top: 15px;" class="controls">
+            <div class="field field-full-mobile">
+                <label>SCREENER WATCHLIST (COMMA SEPARATED)</label>
+                <input id="watchlist" value="NVDA, AMD, TSLA, PLTR, SOFI, MU, AAPL, DELL" style="text-transform:uppercase;">
+            </div>
+            <div class="field field-full-mobile">
+                <button class="btn-purple" onclick="runScanner()">SCAN WATCHLIST</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screener Panel -->
+    <div id="screenerCard" class="card" style="display:none;">
+        <div class="panel-title purple">🔍 SCREENER SCAN RESULTS</div>
+        <div class="screener-container">
+            <div id="screenerOutput"></div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard">
+        <div class="card">
+            <div id="chart"></div>
+        </div>
+        <div class="card">
+            <div class="panel-title">Trade Decision Engine</div>
+            <div id="tradeOutput">
+                <div style="text-align:center; padding:40px 10px; color:#64748b;">
+                    Tap "ANALYZE TICKER" to run engine...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// =====================================
+// GLOBAL VARIABLES & CHART INITIALIZER
+// =====================================
+let chart;
+let candleSeries;
+let ema21Series;
+let sma50Series;
+let sma200Series;
+
+let entryPriceLine;
+let stopPriceLine;
+let targetPriceLine;
+
+function initChart() {
+    const box = document.getElementById("chart");
+    box.innerHTML = "";
+
+    chart = LightweightCharts.createChart(box, {
+        layout: {
+            background: { color: "#020617" },
+            textColor: "#cbd5e1"
+        },
+        grid: {
+            vertLines: { color: "#1e293b" },
+            horzLines: { color: "#1e293b" }
+        },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        rightPriceScale: { borderColor: "#1e293b" },
+        timeScale: { borderColor: "#1e293b" },
+        handleScroll: { vertTouchDrag: false }
+    });
+
+    candleSeries = chart.addCandlestickSeries({
+        upColor: "#22c55e",
+        downColor: "#ef4444",
+        borderVisible: false,
+        wickUpColor: "#22c55e",
+        wickDownColor: "#ef4444"
+    });
+
+    ema21Series = chart.addLineSeries({ color: "#60a5fa", lineWidth: 2 });
+    sma50Series = chart.addLineSeries({ color: "#facc15", lineWidth: 1 });
+    sma200Series = chart.addLineSeries({ color: "#f87171", lineWidth: 2 });
+}
+
+window.addEventListener('load', initChart);
+window.addEventListener('resize', () => {
+    if (chart) {
+        chart.applyOptions({ width: document.getElementById("chart").clientWidth });
+    }
+});
+
+// =====================================
+// DATA FETCHING & TECHNICAL INDICATORS
+// =====================================
+const PROXIES = [
+    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    (url) => `https://thingproxy.freeboard.io/fetch/${url}`
+];
+
+async function fetchMarketData(url) {
+    for (const proxyFn of PROXIES) {
+        try {
+            let response = await fetch(proxyFn(url));
+            if (response.ok) {
+                let data = await response.json();
+                if (data && data.chart && data.chart.result && data.chart.result[0]) {
+                    return data;
+                }
+            }
+        } catch(e) {}
+    }
+    throw new Error("Unable to fetch market data via CORS proxies. Try reloading or check internet connection.");
+}
+
+function sma(values, period) {
+    if (values.length < period) return null;
+    let sum = 0;
+    for (let i = values.length - period; i < values.length; i++) {
+        sum += values[i];
+    }
+    return sum / period;
+}
+
+function ema(values, period) {
+    if (values.length < period) return null;
+    let k = 2 / (period + 1);
+    let emaVal = sma(values.slice(0, period), period);
+    for (let i = period; i < values.length; i++) {
+        emaVal = (values[i] - emaVal) * k + emaVal;
+    }
+    return emaVal;
+}
+
+function RSI(values, period = 14) {
+    if (values.length <= period) return 50;
+    let gains = 0, losses = 0;
+
+    for (let i = 1; i <= period; i++) {
+        let diff = values[i] - values[i-1];
+        if (diff >= 0) gains += diff;
+        else losses -= diff;
+    }
+
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+
+    for (let i = period + 1; i < values.length; i++) {
+        let diff = values[i] - values[i-1];
+        let gain = diff > 0 ? diff : 0;
+        let loss = diff < 0 ? -diff : 0;
+        avgGain = ((avgGain * (period - 1)) + gain) / period;
+        avgLoss = ((avgLoss * (period - 1)) + loss) / period;
+    }
+
+    if (avgLoss === 0) return 100;
+    let rs = avgGain / avgLoss;
+    return 100 - (100 / (1 + rs));
+}
+
+function ATR(high, low, close, period = 14) {
+    let tr = [];
+    for (let i = 1; i < close.length; i++) {
+        tr.push(Math.max(
+            high[i] - low[i],
+            Math.abs(high[i] - close[i-1]),
+            Math.abs(low[i] - close[i-1])
+        ));
+    }
+    return sma(tr.slice(-period), period) || (close[close.length-1] * 0.02);
+}
+
+function calculateVWAP(high, low, close, volume) {
+    let cumulativePV = 0;
+    let cumulativeVolume = 0;
+    for (let i = 0; i < close.length; i++) {
+        let typical = (high[i] + low[i] + close[i]) / 3;
+        cumulativePV += typical * volume[i];
+        cumulativeVolume += volume[i];
+    }
+    return cumulativeVolume === 0 ? close[close.length - 1] : cumulativePV / cumulativeVolume;
+}
+
+function MACD(values) {
+    let fast = ema(values, 12);
+    let slow = ema(values, 26);
+    if (!fast || !slow) return { macd: 0, signal: 0 };
+    let macdVal = fast - slow;
+    return {
+        macd: macdVal,
+        signal: ema(values.slice(-9), 9) || 0
+    };
+}
+
+async function loadTickerData(ticker, timeframe = "1d") {
+    ticker = ticker.toUpperCase();
+    let range = timeframe === "1h" ? "1mo" : "1y";
+    let interval = timeframe === "1h" ? "1h" : "1d";
+
+    let url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
+    let raw = await fetchMarketData(url);
+    
+    if (!raw.chart || !raw.chart.result || !raw.chart.result[0]) {
+        throw new Error("Invalid response for ticker symbol " + ticker);
+    }
+
+    let result = raw.chart.result[0];
+    let q = result.indicators.quote[0];
+
+    let candles = [];
+    let close = [], high = [], low = [], volume = [];
+
+    for (let i = 0; i < result.timestamp.length; i++) {
+        if (q.close[i] != null && q.open[i] != null && q.high[i] != null && q.low[i] != null) {
+            candles.push({
+                time: result.timestamp[i],
+                open: q.open[i],
+                high: q.high[i],
+                low: q.low[i],
+                close: q.close[i]
+            });
+            close.push(q.close[i]);
+            high.push(q.high[i]);
+            low.push(q.low[i]);
+            volume.push(q.volume[i] || 0);
+        }
+    }
+
+    if (candles.length === 0) throw new Error("No price data found for " + ticker);
+
+    const price = close[close.length - 1];
+    const support = Math.min(...low.slice(-20));
+    const resistance = Math.max(...high.slice(-20));
+
+    return {
+        ticker,
+        candles,
+        close,
+        high,
+        low,
+        volume,
+        price,
+        support,
+        resistance,
+        sma20: sma(close, 20),
+        sma50: sma(close, 50),
+        sma200: sma(close, 200),
+        ema21: ema(close, 21),
+        rsi: RSI(close),
+        atr: ATR(high, low, close),
+        vwap: calculateVWAP(high, low, close, volume),
+        macd: MACD(close)
+    };
+}
+
+// =====================================
+// UNIFIED SETUP EVALUATION & SCORING
+// =====================================
+function analyzeSetup(data) {
+    let longScore = 0;
+    let shortScore = 0;
+    let reasons = [];
+
+    if (data.ema21 && data.price > data.ema21) {
+        longScore += 2;
+        reasons.push(`Price ($${data.price.toFixed(2)}) > EMA21 ($${data.ema21.toFixed(2)}) [Bullish Trend]`);
+    } else if (data.ema21) {
+        shortScore += 2;
+        reasons.push(`Price ($${data.price.toFixed(2)}) < EMA21 ($${data.ema21.toFixed(2)}) [Bearish Trend]`);
+    }
+
+    if (data.sma200 && data.price > data.sma200) {
+        longScore += 2;
+        reasons.push(`Price above 200 SMA ($${data.sma200.toFixed(2)}) [Macro Bullish]`);
+    } else if (data.sma200) {
+        shortScore += 2;
+        reasons.push(`Price below 200 SMA ($${data.sma200.toFixed(2)}) [Macro Bearish]`);
+    }
+
+    if (data.rsi >= 45 && data.rsi <= 65) {
+        longScore += 1;
+        reasons.push(`RSI (${data.rsi.toFixed(1)}) in momentum zone`);
+    } else if (data.rsi > 70) {
+        shortScore += 1;
+        reasons.push(`RSI (${data.rsi.toFixed(1)}) Overbought risk`);
+    } else if (data.rsi < 30) {
+        longScore += 1;
+        reasons.push(`RSI (${data.rsi.toFixed(1)}) Oversold bounce`);
+    }
+
+    if (data.macd.macd > data.macd.signal) {
+        longScore += 2;
+        reasons.push("MACD Bullish crossover");
+    } else {
+        shortScore += 2;
+        reasons.push("MACD Bearish crossover");
+    }
+
+    if (data.price > data.vwap) {
+        longScore += 1;
+        reasons.push("Trading above VWAP support");
+    } else {
+        shortScore += 1;
+        reasons.push("Trading below VWAP resistance");
+    }
+
+    let direction = "HOLD";
+    let score = 0;
+
+    if (longScore > shortScore && longScore >= 4) {
+        direction = "LONG";
+        score = longScore;
+    } else if (shortScore > longScore && shortScore >= 4) {
+        direction = "SHORT";
+        score = shortScore;
+    }
+
+    let confidence = Math.min(95, Math.round((score / 8) * 100));
+
+    return { direction, score, confidence, longScore, shortScore, reasons };
+}
+
+function calculateTradeLevels(data, setup) {
+    let atr = data.atr;
+    let entry = data.price;
+    let stop = 0, target = 0;
+
+    if (setup.direction === "LONG") {
+        stop = Math.min(entry - (atr * 1.5), data.support * 0.99);
+        target = entry + (atr * 3.0);
+    } else if (setup.direction === "SHORT") {
+        stop = Math.max(entry + (atr * 1.5), data.resistance * 1.01);
+        target = entry - (atr * 3.0);
+    } else {
+        stop = entry - (atr * 1.5);
+        target = entry + (atr * 1.5);
+    }
+
+    let riskPerShare = Math.abs(entry - stop) || 1;
+    let rewardRisk = Math.abs(target - entry) / riskPerShare;
+
+    return { entry, stop, target, riskPerShare, rewardRisk };
+}
+
+function calculatePositionSize(account, riskPercent, trade, price, maxPosPercent) {
+    let riskAmount = account * (riskPercent / 100);
+    let sharesByRisk = Math.floor(riskAmount / trade.riskPerShare);
+    let maxShares = Math.floor((account * (maxPosPercent / 100)) / price);
+    return Math.max(0, Math.min(sharesByRisk, maxShares));
+}
+
+function gradeSetup(confidence) {
+    if (confidence >= 85) return "A+";
+    if (confidence >= 70) return "A";
+    if (confidence >= 55) return "B";
+    return "C";
+}
+
+// =====================================
+// CHART RENDER & LEVEL LINES
+// =====================================
+function formatLineData(candles, period) {
+    let values = [];
+    for (let i = 0; i < candles.length; i++) {
+        if (i >= period - 1) {
+            let slice = candles.slice(i - period + 1, i + 1).map(x => x.close);
+            let value = slice.reduce((a, b) => a + b, 0) / period;
+            values.push({ time: candles[i].time, value });
+        }
+    }
+    return values;
+}
+
+function calculateEMASeries(candles, period) {
+    if (candles.length < period) return [];
+    let k = 2 / (period + 1);
+    let result = [];
+    
+    let sum = 0;
+    for (let i = 0; i < period; i++) sum += candles[i].close;
+    let prevEMA = sum / period;
+    result.push({ time: candles[period - 1].time, value: prevEMA });
+
+    for (let i = period; i < candles.length; i++) {
+        prevEMA = (candles[i].close - prevEMA) * k + prevEMA;
+        result.push({ time: candles[i].time, value: prevEMA });
+    }
+    return result;
+}
+
+function drawTradeLevels(trade) {
+    if (entryPriceLine) candleSeries.removePriceLine(entryPriceLine);
+    if (stopPriceLine) candleSeries.removePriceLine(stopPriceLine);
+    if (targetPriceLine) candleSeries.removePriceLine(targetPriceLine);
+
+    if (!trade || !trade.entry || trade.stop === 0) return;
+
+    entryPriceLine = candleSeries.createPriceLine({
+        price: trade.entry,
+        color: '#22c55e',
+        lineWidth: 2,
+        lineStyle: LightweightCharts.LineStyle.Solid,
+        axisLabelVisible: true,
+        title: 'ENTRY',
+    });
+
+    stopPriceLine = candleSeries.createPriceLine({
+        price: trade.stop,
+        color: '#ef4444',
+        lineWidth: 2,
+        lineStyle: LightweightCharts.LineStyle.Solid,
+        axisLabelVisible: true,
+        title: 'STOP',
+    });
+
+    targetPriceLine = candleSeries.createPriceLine({
+        price: trade.target,
+        color: '#3b82f6',
+        lineWidth: 2,
+        lineStyle: LightweightCharts.LineStyle.Solid,
+      
