@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Halifax Trade Engine v21 — Improved Prototype</title>
-  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     :root {
       --bg: #0b1220;
@@ -16,22 +15,17 @@
       --muted: #94a3b8;
       --success: #22c55e;
       --danger: #ef4444;
-      --warning: #f59e0b;
-      --info: #38bdf8;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
       min-height: 100vh;
     }
-
     .header {
-      background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+      background: #0f172a;
       border-bottom: 1px solid var(--panel-border);
       padding: 14px 24px;
       display: flex;
@@ -41,13 +35,7 @@
       top: 0;
       z-index: 50;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .logo { display: flex; align-items: center; gap: 12px; }
     .logo-badge {
       background: var(--accent);
       color: white;
@@ -56,49 +44,28 @@
       padding: 6px 10px;
       border-radius: 8px;
     }
-
-    .logo h1 {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .logo span {
-      font-size: 12px;
-      color: var(--muted);
-      display: block;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
+    .logo h1 { font-size: 18px; font-weight: 600; }
+    .logo span { font-size: 12px; color: var(--muted); display: block; }
+    .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       background: var(--success);
       border-radius: 50%;
       box-shadow: 0 0 8px var(--success);
     }
-
     .container {
-      max-width: 1280px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 20px;
       display: grid;
       gap: 16px;
     }
-
     .panel {
       background: var(--panel);
       border: 1px solid var(--panel-border);
       border-radius: 12px;
       overflow: hidden;
     }
-
     .panel-header {
       padding: 12px 16px;
       border-bottom: 1px solid var(--panel-border);
@@ -111,36 +78,24 @@
       color: var(--muted);
       text-transform: uppercase;
     }
-
-    .panel-body {
-      padding: 16px;
-    }
-
-    /* Trade Ticket */
+    .panel-body { padding: 16px; }
     .ticket-grid {
       display: grid;
-      grid-template-columns: 1fr auto auto auto auto;
+      grid-template-columns: 1.5fr auto auto auto auto;
       gap: 12px;
       align-items: end;
     }
-
-    @media (max-width: 900px) {
-      .ticket-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+    @media (max-width: 800px) {
+      .ticket-grid { grid-template-columns: 1fr 1fr; }
     }
-
     label {
       display: block;
       font-size: 11px;
       color: var(--muted);
       margin-bottom: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
     }
-
-    input[type="text"],
-    input[type="number"] {
+    input[type="text"], input[type="number"] {
       width: 100%;
       background: #0f172a;
       border: 1px solid var(--panel-border);
@@ -149,42 +104,20 @@
       color: var(--text);
       font-size: 14px;
       outline: none;
-      transition: border-color 0.15s;
     }
-
-    input:focus {
-      border-color: var(--accent);
-    }
-
-    .style-btns {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
+    input:focus { border-color: var(--accent); }
+    .style-btns { display: flex; gap: 4px; flex-wrap: wrap; }
     .style-btn {
       background: #1e293b;
-      border: 1px solid transparent;
+      border: none;
       color: var(--muted);
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
     }
-
-    .style-btn:hover {
-      background: #334155;
-      color: var(--text);
-    }
-
-    .style-btn.active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
+    .style-btn.active { background: var(--accent); color: white; }
     .btn {
       background: var(--accent);
       color: white;
@@ -194,87 +127,52 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
     }
-
-    .btn:hover {
-      background: var(--accent-hover);
-    }
-
+    .btn:hover { background: var(--accent-hover); }
     .btn-secondary {
       background: #1e293b;
       color: var(--text);
     }
-
-    .btn-secondary:hover {
-      background: #334155;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-
-    /* Decision Panel */
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .decision-empty {
       text-align: center;
-      padding: 40px 20px;
+      padding: 48px 20px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
     }
-
-    .decision-content {
-      display: none;
-    }
-
-    .decision-content.visible {
-      display: block;
-    }
-
+    .decision-content { display: none; }
+    .decision-content.visible { display: block; }
     .score-row {
       display: flex;
-      gap: 20px;
+      gap: 24px;
       align-items: center;
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
-
     .score-circle {
-      width: 90px;
-      height: 90px;
+      width: 96px; height: 96px;
       border-radius: 50%;
       background: conic-gradient(var(--accent) 0% 72%, #1e293b 72% 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      flex-shrink: 0;
     }
-
     .score-circle::before {
       content: "";
       position: absolute;
-      width: 70px;
-      height: 70px;
+      width: 74px; height: 74px;
       background: var(--panel);
       border-radius: 50%;
     }
-
     .score-value {
       position: relative;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
       z-index: 1;
     }
-
-    .grade {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--success);
-    }
-
+    .grade { font-size: 28px; font-weight: 700; color: var(--success); }
     .side-badge {
       display: inline-block;
       padding: 4px 12px;
@@ -282,100 +180,28 @@
       font-weight: 700;
       font-size: 14px;
     }
-
-    .side-long {
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--success);
-    }
-
-    .side-short {
-      background: rgba(239, 68, 68, 0.15);
-      color: var(--danger);
-    }
-
+    .side-long { background: rgba(34,197,94,0.15); color: var(--success); }
     .levels {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
       margin: 16px 0;
     }
-
     .level-card {
       background: #0f172a;
       border: 1px solid var(--panel-border);
       border-radius: 8px;
       padding: 12px;
     }
-
-    .level-card .label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .level-card .value {
-      font-size: 18px;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    /* Factor Breakdown */
-    .factors {
-      margin-top: 20px;
-    }
-
-    .factor {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-      font-size: 13px;
-    }
-
-    .factor-name {
-      width: 180px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-
-    .factor-bar {
-      flex: 1;
-      height: 8px;
-      background: #1e293b;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .factor-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 4px;
-    }
-
-    .factor-score {
-      width: 40px;
-      text-align: right;
-      font-weight: 600;
-    }
-
-    /* Chart */
-    #chart-container {
-      height: 320px;
-      width: 100%;
-      margin-top: 16px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #0f172a;
-    }
-
-    /* Regime badges */
-    .regime-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
+    .level-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+    .level-card .value { font-size: 17px; font-weight: 600; margin-top: 2px; }
+    .factors { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--panel-border); }
+    .factor { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 13px; }
+    .factor-name { width: 170px; color: var(--muted); flex-shrink: 0; }
+    .factor-bar { flex: 1; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+    .factor-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+    .factor-score { width: 36px; text-align: right; font-weight: 600; }
+    .regime-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .regime-badge {
       background: #1e293b;
       border: 1px solid var(--panel-border);
@@ -384,54 +210,56 @@
       font-size: 12px;
       color: var(--muted);
     }
-
-    .regime-badge.hot {
-      border-color: var(--danger);
-      color: #fca5a5;
-    }
-
-    .regime-badge.good {
-      border-color: var(--success);
-      color: #86efac;
-    }
-
-    /* Collapsible */
-    .collapsible-header {
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .collapsible-header:hover {
-      color: var(--text);
-    }
-
-    .collapsible-body {
-      display: none;
-      padding: 16px;
-      border-top: 1px solid var(--panel-border);
-    }
-
-    .collapsible-body.open {
-      display: block;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
-    }
-
-    .improvements {
-      background: rgba(139, 92, 246, 0.08);
-      border: 1px solid rgba(139, 92, 246, 0.25);
-      border-radius: 8px;
+    .regime-badge.hot { border-color: var(--danger); color: #fca5a5; }
+    .regime-badge.good { border-color: var(--success); color: #86efac; }
+    .collapsible-header { cursor: pointer; }
+    .collapsible-body { display: none; padding: 16px; border-top: 1px solid var(--panel-border); }
+    .collapsible-body.open { display: block; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .banner {
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 10px;
       padding: 12px 16px;
-      margin-bottom: 16px;
       font-size: 13px;
     }
-
-    .improvements strong {
-      color: var(--accent);
+    .banner strong { color: var(--accent); }
+    .demo-note {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #fbbf24;
+      margin-bottom: 16px;
+    }
+    .quick-tickers { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .quick-ticker {
+      background: #1e293b;
+      border: 1px solid var(--panel-border);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .quick-ticker:hover { border-color: var(--accent); color: var(--text); }
+    #chart-placeholder {
+      height: 220px;
+      margin-top: 16px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-level {
+      position: absolute;
+      left: 0; right: 0;
+      border-top: 1px dashed;
+      font-size: 11px;
+      padding-left: 8px;
+      line-height: 1.2;
     }
   </style>
 </head>
@@ -444,44 +272,30 @@
         <span>Predictive swing research • Transparent scoring • Regime adaptive</span>
       </div>
     </div>
-    <div class="status">
-      <div class="status-dot"></div>
-      Engine ready
-    </div>
+    <div class="status"><div class="status-dot"></div> Engine ready</div>
   </header>
 
   <div class="container">
-
-    <!-- Improvements Banner -->
-    <div class="improvements">
-      <strong>Prototype improvements included:</strong>
-      Autocomplete-ready ticker • Enter-to-analyze • Transparent multi-factor score • Regime badges • Chart with levels • Confidence grade • Factor breakdown
+    <div class="banner">
+      <strong>How to use:</strong> Click a quick ticker button (AAPL / NVDA / SPY) <strong>or</strong> type a ticker and press <strong>Enter</strong> / click <strong>Analyze</strong>.<br>
+      This is a UI prototype with demo data — no live market feed.
     </div>
 
-    <!-- PRIMARY TRADE COMMAND -->
     <section class="panel">
-      <div class="panel-header">
-        <span>01 Primary Trade Command</span>
-      </div>
+      <div class="panel-header"><span>01 Primary Trade Command</span></div>
       <div class="panel-body">
         <div class="ticket-grid">
           <div>
             <label for="ticker">Ticker</label>
-            <input type="text" id="ticker" placeholder="e.g. AAPL, NVDA, SPY" list="ticker-list" autocomplete="off" />
-            <datalist id="ticker-list">
-              <option value="AAPL">
-              <option value="NVDA">
-              <option value="MSFT">
-              <option value="TSLA">
-              <option value="SPY">
-              <option value="QQQ">
-              <option value="AMD">
-              <option value="META">
-              <option value="AMZN">
-              <option value="GOOGL">
-            </datalist>
+            <input type="text" id="ticker" placeholder="Type AAPL, NVDA, SPY..." autocomplete="off" />
+            <div class="quick-tickers">
+              <button class="quick-ticker" data-t="AAPL">AAPL</button>
+              <button class="quick-ticker" data-t="NVDA">NVDA</button>
+              <button class="quick-ticker" data-t="SPY">SPY</button>
+              <button class="quick-ticker" data-t="TSLA">TSLA</button>
+              <button class="quick-ticker" data-t="AMD">AMD</button>
+            </div>
           </div>
-
           <div>
             <label>Trading Style</label>
             <div class="style-btns">
@@ -491,27 +305,20 @@
               <button class="style-btn" data-style="position">Position</button>
             </div>
           </div>
-
           <div>
             <label for="account">Account ($)</label>
             <input type="number" id="account" value="25000" min="1000" step="1000" />
           </div>
-
           <div>
             <label for="risk">Risk %</label>
             <input type="number" id="risk" value="1" min="0.25" max="5" step="0.25" />
           </div>
-
           <div>
             <label>&nbsp;</label>
             <button class="btn" id="analyze-btn">Analyze</button>
           </div>
         </div>
-
-        <p class="hint" id="style-hint">
-          <strong>SWING:</strong> Multi-day setup. Emphasizes Daily + Weekly trend. 1-hour mainly for entry timing.
-        </p>
-
+        <p class="hint" id="style-hint"><strong>SWING:</strong> Multi-day setup. Emphasizes Daily + Weekly trend.</p>
         <div class="btn-row">
           <button class="btn btn-secondary" id="copy-btn">Copy Plan</button>
           <button class="btn btn-secondary" id="paper-btn">Paper Trade</button>
@@ -520,18 +327,19 @@
       </div>
     </section>
 
-    <!-- PREDICTIVE DECISION -->
     <section class="panel">
       <div class="panel-header">
         <span>Halifax Predictive Trade Decision</span>
-        <span style="font-weight:400;text-transform:none;letter-spacing:0;">Transparent multi-factor score</span>
+        <span style="font-weight:400;text-transform:none;">Transparent multi-factor score</span>
       </div>
       <div class="panel-body">
         <div class="decision-empty" id="empty-state">
-          Enter a ticker and press <strong>Analyze</strong> (or hit Enter).
+          Click a quick ticker above (AAPL / NVDA / SPY) or type one and press Analyze.
         </div>
 
         <div class="decision-content" id="decision">
+          <div class="demo-note">Demo data only — not live market analysis. For UI evaluation.</div>
+
           <div class="score-row">
             <div class="score-circle" id="score-circle">
               <div class="score-value" id="score-value">72</div>
@@ -541,11 +349,9 @@
                 <span class="side-badge side-long" id="side-badge">LONG</span>
                 <span class="grade" id="grade">B+</span>
               </div>
-              <div style="font-size:15px;" id="thesis">
-                Strong daily structure + relative strength vs SPY. Macro regime neutral-to-supportive.
-              </div>
-              <div class="regime-row" id="regime-row">
-                <span class="regime-badge">Inflation Pressure 63%</span>
+              <div style="font-size:15px;" id="thesis">Strong daily structure + relative strength vs SPY.</div>
+              <div class="regime-row">
+                <span class="regime-badge">Inflation 63%</span>
                 <span class="regime-badge hot">Hawkish Rates 63%</span>
                 <span class="regime-badge">Equity Tailwind 44%</span>
                 <span class="regime-badge good">Volume Confirmed</span>
@@ -554,140 +360,64 @@
           </div>
 
           <div class="levels">
-            <div class="level-card">
-              <div class="label">Current</div>
-              <div class="value" id="price">$178.42</div>
-            </div>
-            <div class="level-card">
-              <div class="label">Entry Zone</div>
-              <div class="value" id="entry">$176.80 – $178.20</div>
-            </div>
-            <div class="level-card">
-              <div class="label">Stop</div>
-              <div class="value" style="color:var(--danger)" id="stop">$172.40</div>
-            </div>
-            <div class="level-card">
-              <div class="label">Target 1</div>
-              <div class="value" style="color:var(--success)" id="target1">$185.60</div>
-            </div>
-            <div class="level-card">
-              <div class="label">Target 2</div>
-              <div class="value" style="color:var(--success)" id="target2">$192.10</div>
-            </div>
-            <div class="level-card">
-              <div class="label">Position Size</div>
-              <div class="value" id="size">142 shares</div>
-            </div>
+            <div class="level-card"><div class="label">Current</div><div class="value" id="price">$178.42</div></div>
+            <div class="level-card"><div class="label">Entry Zone</div><div class="value" id="entry">$176.80 – $178.20</div></div>
+            <div class="level-card"><div class="label">Stop</div><div class="value" style="color:var(--danger)" id="stop">$172.40</div></div>
+            <div class="level-card"><div class="label">Target 1</div><div class="value" style="color:var(--success)" id="target1">$185.60</div></div>
+            <div class="level-card"><div class="label">Target 2</div><div class="value" style="color:var(--success)" id="target2">$192.10</div></div>
+            <div class="level-card"><div class="label">Position Size</div><div class="value" id="size">142 shares</div></div>
           </div>
 
-          <!-- Factor Breakdown (Transparency) -->
           <div class="factors">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--muted);">Score Breakdown</div>
-            <div class="factor">
-              <div class="factor-name">Multi-TF Structure</div>
-              <div class="factor-bar"><div class="factor-fill" style="width:82%"></div></div>
-              <div class="factor-score">82</div>
-            </div>
-            <div class="factor">
-              <div class="factor-name">Relative Strength</div>
-              <div class="factor-bar"><div class="factor-fill" style="width:76%"></div></div>
-              <div class="factor-score">76</div>
-            </div>
-            <div class="factor">
-              <div class="factor-name">Volume Confirmation</div>
-              <div class="factor-bar"><div class="factor-fill" style="width:68%"></div></div>
-              <div class="factor-score">68</div>
-            </div>
-            <div class="factor">
-              <div class="factor-name">Volatility Regime</div>
-              <div class="factor-bar"><div class="factor-fill" style="width:71%"></div></div>
-              <div class="factor-score">71</div>
-            </div>
-            <div class="factor">
-              <div class="factor-name">Macro Alignment</div>
-              <div class="factor-bar"><div class="factor-fill" style="width:58%"></div></div>
-              <div class="factor-score">58</div>
-            </div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--muted);">Score Breakdown</div>
+            <div class="factor"><div class="factor-name">Multi-TF Structure</div><div class="factor-bar"><div class="factor-fill" id="f1" style="width:82%"></div></div><div class="factor-score" id="s1">82</div></div>
+            <div class="factor"><div class="factor-name">Relative Strength</div><div class="factor-bar"><div class="factor-fill" id="f2" style="width:76%"></div></div><div class="factor-score" id="s2">76</div></div>
+            <div class="factor"><div class="factor-name">Volume Confirmation</div><div class="factor-bar"><div class="factor-fill" id="f3" style="width:68%"></div></div><div class="factor-score" id="s3">68</div></div>
+            <div class="factor"><div class="factor-name">Volatility Regime</div><div class="factor-bar"><div class="factor-fill" id="f4" style="width:71%"></div></div><div class="factor-score" id="s4">71</div></div>
+            <div class="factor"><div class="factor-name">Macro Alignment</div><div class="factor-bar"><div class="factor-fill" id="f5" style="width:58%"></div></div><div class="factor-score" id="s5">58</div></div>
           </div>
 
-          <!-- Chart -->
-          <div id="chart-container"></div>
+          <div id="chart-placeholder">
+            <div id="chart-levels"></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Paper Journal (simplified) -->
     <section class="panel">
       <div class="panel-header collapsible-header" onclick="toggleSection(this)">
-        <span>Paper Signal Journal — Local Track Record</span>
-        <span>+</span>
+        <span>Paper Signal Journal</span><span>+</span>
       </div>
       <div class="collapsible-body">
-        <p class="hint">Transparent paper trading. Export/Import ready in full version. Manual exits only — no fabricated fills.</p>
-        <div style="margin-top:12px;font-size:13px;color:var(--muted);">
-          Logged: 0 &nbsp;|&nbsp; Closed: 0 &nbsp;|&nbsp; Win Rate: — &nbsp;|&nbsp; Expectancy: —
-        </div>
+        <p class="hint">Transparent paper trading. Manual exits only.</p>
       </div>
     </section>
 
-    <!-- Historical Lab -->
     <section class="panel">
       <div class="panel-header collapsible-header" onclick="toggleSection(this)">
-        <span>Historical Strategy Lab — Point-in-Time Backtest</span>
-        <span>+</span>
+        <span>Historical Strategy Lab</span><span>+</span>
       </div>
       <div class="collapsible-body">
-        <p class="hint">
-          Walk-forward capable in upgraded version. Current engine uses Daily structure + prior Weekly bar with optional benchmark relative strength. Slippage, ATR stops, and non-overlapping trades applied.
-        </p>
-        <div class="btn-row" style="margin-top:12px;">
-          <button class="btn btn-secondary">Run Backtest</button>
-          <button class="btn btn-secondary">Compare Strategies</button>
-        </div>
+        <p class="hint">Point-in-time backtest using Daily + prior Weekly structure.</p>
       </div>
     </section>
-
-    <!-- Macro -->
-    <section class="panel">
-      <div class="panel-header collapsible-header" onclick="toggleSection(this)">
-        <span>Advanced Position, Leveraged ETF & Macro Inputs</span>
-        <span>+</span>
-      </div>
-      <div class="collapsible-body">
-        <div class="regime-row">
-          <span class="regime-badge">Shiller CAPE 42.56 (Extreme)</span>
-          <span class="regime-badge hot">CPI Hot 49%</span>
-          <span class="regime-badge hot">PCE Hot 72%</span>
-          <span class="regime-badge">Inflation Pressure 63%</span>
-          <span class="regime-badge">Hawkish Rates 63%</span>
-          <span class="regime-badge">Weak Growth Risk 59%</span>
-          <span class="regime-badge">Equity Tailwind 44%</span>
-        </div>
-        <p class="hint" style="margin-top:12px;">
-          Official-data snapshot + manual overrides. Regime probabilities only — no invented consensus.
-        </p>
-      </div>
-    </section>
-
   </div>
 
   <script>
-    // Style buttons
     document.querySelectorAll('.style-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const hints = {
-          scalp: '<strong>SCALP:</strong> Intraday only. Heavy focus on 5-min / 15-min structure and volume.',
-          day: '<strong>DAY:</strong> Intraday to overnight. Uses 15-min + Hourly + Daily trend filter.',
-          swing: '<strong>SWING:</strong> Multi-day setup. Emphasizes Daily + Weekly trend. 1-hour mainly for entry timing.',
-          position: '<strong>POSITION:</strong> Multi-week. Weekly + Monthly structure dominates. Wider stops.'
-        };
-        document.getElementById('style-hint').innerHTML = hints[btn.dataset.style] || hints.swing;
       });
     });
 
-    // Analyze
+    document.querySelectorAll('.quick-ticker').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('ticker').value = btn.dataset.t;
+        runAnalyze();
+      });
+    });
+
     const tickerInput = document.getElementById('ticker');
     const analyzeBtn = document.getElementById('analyze-btn');
 
@@ -695,54 +425,84 @@
       const ticker = tickerInput.value.trim().toUpperCase();
       if (!ticker) {
         tickerInput.focus();
+        tickerInput.style.borderColor = '#ef4444';
+        setTimeout(() => tickerInput.style.borderColor = '', 1000);
         return;
       }
 
       document.getElementById('empty-state').style.display = 'none';
       document.getElementById('decision').classList.add('visible');
 
-      // Demo data (in real version this comes from the engine)
-      document.getElementById('score-value').textContent = '72';
-      document.getElementById('grade').textContent = 'B+';
-      document.getElementById('side-badge').textContent = 'LONG';
-      document.getElementById('side-badge').className = 'side-badge side-long';
-      document.getElementById('thesis').textContent =
-        `${ticker}: Strong daily structure + relative strength vs SPY. Macro regime neutral-to-supportive. Volume confirmation present.`;
-      document.getElementById('price').textContent = '$178.42';
-      document.getElementById('entry').textContent = '$176.80 – $178.20';
-      document.getElementById('stop').textContent = '$172.40';
-      document.getElementById('target1').textContent = '$185.60';
-      document.getElementById('target2').textContent = '$192.10';
+      const demos = {
+        AAPL: { score: 74, grade: 'B+', price: 178.42, stop: 172.40, t1: 185.60, t2: 192.10, f: [84,78,70,69,61] },
+        NVDA: { score: 81, grade: 'A-', price: 132.85, stop: 124.20, t1: 142.00, t2: 151.50, f: [88,85,76,72,65] },
+        SPY:  { score: 68, grade: 'B',  price: 548.20, stop: 538.50, t1: 558.00, t2: 565.40, f: [72,70,65,68,58] },
+        TSLA: { score: 59, grade: 'C+', price: 241.30, stop: 228.80, t1: 255.00, t2: 268.00, f: [62,55,58,64,48] },
+        AMD:  { score: 71, grade: 'B+', price: 162.40, stop: 154.80, t1: 171.00, t2: 178.50, f: [76,73,69,70,55] }
+      };
 
-      // Position size example
+      const d = demos[ticker] || {
+        score: 70 + Math.floor(Math.random()*15),
+        grade: 'B',
+        price: 80 + Math.random()*120,
+        stop: 0, t1: 0, t2: 0,
+        f: [70,65,60,68,55]
+      };
+
+      const price = d.price;
+      const stop  = d.stop || price * 0.965;
+      const t1    = d.t1 || price * 1.04;
+      const t2    = d.t2 || price * 1.08;
+      const entryL = (price * 0.992).toFixed(2);
+      const entryH = (price * 0.999).toFixed(2);
+
+      document.getElementById('score-value').textContent = d.score;
+      document.getElementById('grade').textContent = d.grade;
+      document.getElementById('side-badge').textContent = 'LONG';
+      document.getElementById('thesis').textContent = ticker + ': Strong daily structure + relative strength vs SPY. Volume confirmation present.';
+      document.getElementById('price').textContent = '$' + price.toFixed(2);
+      document.getElementById('entry').textContent = '$' + entryL + ' – $' + entryH;
+      document.getElementById('stop').textContent = '$' + stop.toFixed(2);
+      document.getElementById('target1').textContent = '$' + t1.toFixed(2);
+      document.getElementById('target2').textContent = '$' + t2.toFixed(2);
+
       const account = parseFloat(document.getElementById('account').value) || 25000;
       const riskPct = parseFloat(document.getElementById('risk').value) || 1;
       const riskDollars = account * (riskPct / 100);
-      const stopDistance = 178.42 - 172.40;
-      const shares = Math.floor(riskDollars / stopDistance);
-      document.getElementById('size').textContent = `${shares} shares (≈$${Math.round(shares * 178.42).toLocaleString()})`;
+      const shares = Math.floor(riskDollars / Math.abs(price - stop));
+      document.getElementById('size').textContent = shares + ' shares (≈$' + Math.round(shares * price).toLocaleString() + ')';
 
-      // Init / update chart
-      initChart();
+      const factors = d.f;
+      for (let i = 0; i < 5; i++) {
+        document.getElementById('f' + (i+1)).style.width = factors[i] + '%';
+        document.getElementById('s' + (i+1)).textContent = factors[i];
+      }
+
+      document.getElementById('score-circle').style.background =
+        'conic-gradient(var(--accent) 0% ' + d.score + '%, #1e293b ' + d.score + '% 100%)';
+
+      // Level preview
+      const min = Math.min(stop, price) * 0.97;
+      const max = Math.max(t2, price) * 1.03;
+      const range = max - min;
+      function pct(v) { return ((max - v) / range) * 100; }
+
+      document.getElementById('chart-levels').innerHTML =
+        '<div class="chart-level" style="top:' + pct(t2) + '%;border-color:#22c55e;color:#86efac;">T2 $' + t2.toFixed(2) + '</div>' +
+        '<div class="chart-level" style="top:' + pct(t1) + '%;border-color:#22c55e;color:#86efac;">T1 $' + t1.toFixed(2) + '</div>' +
+        '<div class="chart-level" style="top:' + pct(price) + '%;border-color:#38bdf8;color:#7dd3fc;border-style:solid;">Current $' + price.toFixed(2) + '</div>' +
+        '<div class="chart-level" style="top:' + pct(stop) + '%;border-color:#ef4444;color:#fca5a5;">Stop $' + stop.toFixed(2) + '</div>';
     }
 
     analyzeBtn.addEventListener('click', runAnalyze);
-    tickerInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') runAnalyze();
-    });
+    tickerInput.addEventListener('keydown', e => { if (e.key === 'Enter') runAnalyze(); });
 
-    // Reset
     document.getElementById('reset-btn').addEventListener('click', () => {
       tickerInput.value = '';
       document.getElementById('empty-state').style.display = 'block';
       document.getElementById('decision').classList.remove('visible');
-      if (window.chart) {
-        window.chart.remove();
-        window.chart = null;
-      }
     });
 
-    // Collapsible sections
     function toggleSection(header) {
       const body = header.nextElementSibling;
       const icon = header.querySelector('span:last-child');
@@ -750,93 +510,20 @@
       icon.textContent = body.classList.contains('open') ? '−' : '+';
     }
 
-    // Simple demo chart
-    let chart = null;
-    function initChart() {
-      const container = document.getElementById('chart-container');
-      if (chart) {
-        chart.remove();
-      }
-      chart = LightweightCharts.createChart(container, {
-        layout: {
-          background: { color: '#0f172a' },
-          textColor: '#94a3b8',
-        },
-        grid: {
-          vertLines: { color: '#1e293b' },
-          horzLines: { color: '#1e293b' },
-        },
-        width: container.clientWidth,
-        height: 320,
-        timeScale: { timeVisible: true },
-      });
-
-      const series = chart.addAreaSeries({
-        topColor: 'rgba(139, 92, 246, 0.3)',
-        bottomColor: 'rgba(139, 92, 246, 0.02)',
-        lineColor: '#8b5cf6',
-        lineWidth: 2,
-      });
-
-      // Demo price data
-      const data = [];
-      let price = 165;
-      const now = Math.floor(Date.now() / 1000);
-      for (let i = 60; i >= 0; i--) {
-        price += (Math.random() - 0.48) * 2.2;
-        data.push({ time: now - i * 86400, value: +price.toFixed(2) });
-      }
-      series.setData(data);
-
-      // Price lines for levels
-      series.createPriceLine({
-        price: 178.42,
-        color: '#38bdf8',
-        lineWidth: 1,
-        lineStyle: 2,
-        axisLabelVisible: true,
-        title: 'Current',
-      });
-      series.createPriceLine({
-        price: 172.40,
-        color: '#ef4444',
-        lineWidth: 1,
-        lineStyle: 2,
-        axisLabelVisible: true,
-        title: 'Stop',
-      });
-      series.createPriceLine({
-        price: 185.60,
-        color: '#22c55e',
-        lineWidth: 1,
-        lineStyle: 2,
-        axisLabelVisible: true,
-        title: 'T1',
-      });
-      series.createPriceLine({
-        price: 192.10,
-        color: '#22c55e',
-        lineWidth: 1,
-        lineStyle: 2,
-        axisLabelVisible: true,
-        title: 'T2',
-      });
-
-      window.chart = chart;
-      window.addEventListener('resize', () => {
-        chart.applyOptions({ width: container.clientWidth });
-      });
-    }
-
-    // Copy plan (demo)
     document.getElementById('copy-btn').addEventListener('click', () => {
-      const ticker = tickerInput.value.trim().toUpperCase() || 'TICKER';
-      const text = `${ticker} LONG | Score 72 (B+) | Entry 176.80-178.20 | Stop 172.40 | T1 185.60 | T2 192.10`;
+      const t = tickerInput.value.trim().toUpperCase() || 'TICKER';
+      const text = t + ' LONG | Score ' + document.getElementById('score-value').textContent +
+        ' | Entry ' + document.getElementById('entry').textContent +
+        ' | Stop ' + document.getElementById('stop').textContent;
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.getElementById('copy-btn');
         btn.textContent = 'Copied!';
         setTimeout(() => btn.textContent = 'Copy Plan', 1500);
       });
+    });
+
+    document.getElementById('paper-btn').addEventListener('click', () => {
+      alert('Paper trade logged (demo only).');
     });
   </script>
 </body>
