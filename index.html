@@ -139,77 +139,97 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
 @media(max-width:620px){.paper-form{grid-template-columns:1fr 1fr}}
 
 
-/* Running market ticker */
+/* Running market ticker — v5 robust build */
 .market-tape{
-  position:sticky;top:0;z-index:5000;
-  background:rgba(2,8,20,.97);
-  border-bottom:1px solid rgba(65,145,226,.45);
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
-  backdrop-filter:blur(10px);
-  overflow:hidden;
+  position:sticky;
+  top:0;
+  z-index:5000;
+  background:#020814;
+  border-bottom:2px solid #245f9c;
+  box-shadow:0 8px 24px rgba(0,0,0,.30);
 }
 .market-tape-head{
-  display:flex;align-items:center;gap:8px;
-  padding:6px 10px 0;
-  color:#76baff;font-size:9px;font-weight:950;letter-spacing:1px;text-transform:uppercase
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:28px;
+  padding:5px 10px;
+  background:#071426;
+  color:#76baff;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:1px;
+  text-transform:uppercase;
 }
-.market-tape-window{
-  overflow:hidden;white-space:nowrap;padding:10px 0 11px;
-  -webkit-mask-image:linear-gradient(90deg,transparent,black 4%,black 96%,transparent);
-  mask-image:linear-gradient(90deg,transparent,black 4%,black 96%,transparent);
+.tape-live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#39e58c;box-shadow:0 0 8px #39e58c;
 }
-.market-tape-track{
-  display:inline-flex;align-items:center;gap:10px;
-  min-width:max-content;
-  animation:halifaxTicker 32s linear infinite;
-  will-change:transform;
-}
-.market-tape:hover .market-tape-track{animation-play-state:paused}
-.tape-item{
-  display:inline-flex;align-items:center;gap:8px;
-  border-right:1px solid #17385f;padding:0 12px 0 2px;
-  font-size:12px
-}
-.tape-symbol{font-weight:950;color:#eaf5ff}
-.tape-price{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#c9dff4;font-weight:800}
-.tape-up{color:var(--green);font-weight:900}
-.tape-down{color:var(--red);font-weight:900}
-.tape-flat{color:var(--yellow);font-weight:900}
 .tape-source{
-  margin-left:auto;color:#7895b1;font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:none
+  margin-left:auto;
+  color:#8ba6c0;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.2px;
+  text-transform:none;
 }
-@keyframes halifaxTicker{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
+.market-marquee{
+  display:block;
+  width:100%;
+  height:38px;
+  line-height:38px;
+  background:#03101f;
+  color:#edf7ff;
+  white-space:nowrap;
 }
-@media (prefers-reduced-motion:reduce){
-  .market-tape-track{animation:none}
-  .market-tape-window{overflow-x:auto}
+.tape-item{
+  display:inline-block;
+  padding:0 18px;
+  border-right:1px solid #1c426c;
+  font-size:12px;
+}
+.tape-symbol{font-weight:950;color:#ffffff;margin-right:7px}
+.tape-price{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#d7eaff;font-weight:800;margin-right:7px}
+.tape-up{color:#39e58c;font-weight:950}
+.tape-down{color:#ff667d;font-weight:950}
+.tape-flat{color:#ffd166;font-weight:950}
+.tape-pause{
+  width:auto;
+  margin-left:6px;
+  padding:4px 8px;
+  min-height:0;
+  font-size:9px;
+  background:#102945;
+  border:1px solid #275b8f;
 }
 
 </style>
 </head>
 <body>
 
-<div class="market-tape" aria-label="Running market ticker">
+<div class="market-tape" id="marketTape" aria-label="Running market ticker">
   <div class="market-tape-head">
-    <span>Market Tape</span>
+    <span class="tape-live-dot"></span>
+    <span>RUNNING MARKET TICKER</span>
     <span class="info-dot" data-term="marketTicker">?</span>
-    <span class="tape-source" id="tapeSource">Demo educational prices</span>
+    <button type="button" class="tape-pause" id="tickerToggle">Pause</button>
+    <span class="tape-source" id="tapeSource">Educational demo prices • slow scroll</span>
   </div>
-  <div class="market-tape-window">
-    <div class="market-tape-track" id="marketTapeTrack">
-      <div class="tape-item"><span class="tape-symbol">SPY</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
-      <div class="tape-item"><span class="tape-symbol">QQQ</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
-      <div class="tape-item"><span class="tape-symbol">NVDA</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
-      <div class="tape-item"><span class="tape-symbol">AAPL</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
 
-      <div class="tape-item"><span class="tape-symbol">SPY</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
-      <div class="tape-item"><span class="tape-symbol">QQQ</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
-      <div class="tape-item"><span class="tape-symbol">NVDA</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
-      <div class="tape-item"><span class="tape-symbol">AAPL</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
-</div>
-  </div>
+  <marquee id="marketMarquee" class="market-marquee" behavior="scroll" direction="left" scrollamount="2" scrolldelay="30" truespeed>
+    <span class="tape-item"><span class="tape-symbol">SPY</span><span class="tape-price">$645.20</span><span class="tape-up">▲ 0.62%</span></span>
+    <span class="tape-item"><span class="tape-symbol">QQQ</span><span class="tape-price">$577.80</span><span class="tape-up">▲ 0.91%</span></span>
+    <span class="tape-item"><span class="tape-symbol">DIA</span><span class="tape-price">$454.10</span><span class="tape-up">▲ 0.28%</span></span>
+    <span class="tape-item"><span class="tape-symbol">IWM</span><span class="tape-price">$228.40</span><span class="tape-down">▼ 0.34%</span></span>
+    <span class="tape-item"><span class="tape-symbol">NVDA</span><span class="tape-price">$181.20</span><span class="tape-up">▲ 1.48%</span></span>
+    <span class="tape-item"><span class="tape-symbol">AAPL</span><span class="tape-price">$232.10</span><span class="tape-up">▲ 0.37%</span></span>
+    <span class="tape-item"><span class="tape-symbol">MSFT</span><span class="tape-price">$516.20</span><span class="tape-down">▼ 0.18%</span></span>
+    <span class="tape-item"><span class="tape-symbol">AMD</span><span class="tape-price">$171.30</span><span class="tape-up">▲ 1.12%</span></span>
+    <span class="tape-item"><span class="tape-symbol">TSLA</span><span class="tape-price">$334.70</span><span class="tape-down">▼ 1.26%</span></span>
+    <span class="tape-item"><span class="tape-symbol">AMZN</span><span class="tape-price">$230.50</span><span class="tape-up">▲ 0.44%</span></span>
+    <span class="tape-item"><span class="tape-symbol">META</span><span class="tape-price">$756.20</span><span class="tape-up">▲ 0.71%</span></span>
+    <span class="tape-item"><span class="tape-symbol">GOOGL</span><span class="tape-price">$212.90</span><span class="tape-down">▼ 0.22%</span></span>
+  </marquee>
 </div>
 
 <div class="container">
@@ -483,7 +503,7 @@ async function loadLive(){
     };
     $("dataStatus").textContent=`Verified Alpha Vantage daily data • ${last.date}`;
     analyzeData(symbol,currentData);
-    $("tapeSource").textContent=`Analyzed ${symbol} verified • other tape symbols are demo`;
+    $("tapeSource").textContent=`${symbol} analysis verified • tape prices shown are demo`;
   }catch(err){
     currentData=null;
     $("dataStatus").textContent="I cannot confirm market data";
@@ -535,7 +555,6 @@ function scoreSetup(d){
 }
 
 function analyzeData(symbol,d){
-  updateTapeFromAnalysis(symbol,d);
   if(!d || !isFinite(d.price) || d.price<=0){setUnknown("I cannot confirm usable market data.");return;}
   const s=scoreSetup(d);
   $("signal").textContent=s.signal;
@@ -620,50 +639,22 @@ $("resetBtn").onclick=()=>location.reload();
 $("ticker").addEventListener("input",()=>{ currentData=null; });
 
 
-/* ---------- Running market ticker ---------- */
-const tapeDemo = [
-  {s:"SPY",p:645.20,c:.62},
-  {s:"QQQ",p:577.80,c:.91},
-  {s:"DIA",p:454.10,c:.28},
-  {s:"IWM",p:228.40,c:-.34},
-  {s:"NVDA",p:181.20,c:1.48},
-  {s:"AAPL",p:232.10,c:.37},
-  {s:"MSFT",p:516.20,c:-.18},
-  {s:"AMD",p:171.30,c:1.12},
-  {s:"TSLA",p:334.70,c:-1.26},
-  {s:"AMZN",p:230.50,c:.44},
-  {s:"META",p:756.20,c:.71},
-  {s:"GOOGL",p:212.90,c:-.22}
-];
-
-function renderMarketTape(items=tapeDemo, sourceText="Demo educational prices"){
-  const track=$("marketTapeTrack");
-  const row=items.map(x=>{
-    const cls=x.c>0?"tape-up":x.c<0?"tape-down":"tape-flat";
-    const arrow=x.c>0?"▲":x.c<0?"▼":"•";
-    return `<div class="tape-item">
-      <span class="tape-symbol">${x.s}</span>
-      <span class="tape-price">$${Number(x.p).toFixed(2)}</span>
-      <span class="${cls}">${arrow} ${Math.abs(Number(x.c)).toFixed(2)}%</span>
-    </div>`;
-  }).join("");
-  // Duplicate content creates a seamless marquee loop.
-  track.innerHTML=row+row;
-  $("tapeSource").textContent=sourceText;
+/* ---------- Running market ticker controls ---------- */
+let tickerPaused=false;
+const tickerToggle=document.getElementById("tickerToggle");
+const marketMarquee=document.getElementById("marketMarquee");
+if(tickerToggle && marketMarquee){
+  tickerToggle.addEventListener("click",()=>{
+    tickerPaused=!tickerPaused;
+    if(tickerPaused){
+      marketMarquee.stop();
+      tickerToggle.textContent="Resume";
+    }else{
+      marketMarquee.start();
+      tickerToggle.textContent="Pause";
+    }
+  });
 }
-
-function updateTapeFromAnalysis(symbol,d){
-  if(!d || !symbol) return;
-  const idx=tapeDemo.findIndex(x=>x.s===symbol);
-  const approximateChange = d.sma20 ? ((d.price-d.sma20)/d.sma20)*100 : 0;
-  const item={s:symbol,p:d.price,c:approximateChange};
-  let items=[...tapeDemo];
-  if(idx>=0) items[idx]=item; else items.unshift(item);
-  renderMarketTape(items,d.label && d.label.startsWith("LIVE") ? "Includes verified analyzed price • change vs 20-day average" : "Demo educational prices");
-}
-
-renderMarketTape();
-analyzeData("NVDA",demoSets.NVDA);
 
 /* ---------- Beginner term popups ---------- */
 const glossary = {
@@ -806,7 +797,8 @@ function closePaperPosition(id,reason,exit){
   paper.cash += p.realizedPL;
   paper.positions.splice(idx,1);
   paper.history.push(p);
-  savePaper();renderPaper();
+  savePaper();analyzeData("NVDA",demoSets.NVDA);
+renderPaper();
 }
 window.paperClose=function(id){
   const p=paper.positions.find(x=>x.id===id);
