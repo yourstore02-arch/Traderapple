@@ -93,9 +93,125 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
   .container{padding:8px}
   .card{padding:12px;border-radius:13px}
 }
+
+/* Beginner glossary + paper trading */
+.term{
+  color:#9fd1ff;text-decoration:underline;text-decoration-style:dotted;
+  text-underline-offset:3px;cursor:pointer;font-weight:800
+}
+.term:hover{color:#d7ecff}
+.info-dot{
+  display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;
+  border:1px solid #2b6eaa;color:#9fd1ff;font-size:11px;font-weight:950;
+  cursor:pointer;margin-left:5px;vertical-align:middle;background:#061a31
+}
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;
+  justify-content:center;padding:18px;z-index:9999
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  width:min(620px,100%);max-height:84vh;overflow:auto;background:#061426;
+  border:1px solid #2f6fa8;border-radius:16px;padding:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.55)
+}
+.modal-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.modal h3{margin:0;font-size:21px}
+.modal-close{width:auto;padding:7px 10px;background:#102945;border:1px solid #275b8f}
+.modal-body{color:#c8daeb;font-size:13px;line-height:1.62;margin-top:10px}
+.modal-example{margin-top:12px;padding:10px;border-radius:10px;background:#031020;border-left:3px solid var(--blue)}
+.paper-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.paper-balance{font-size:23px;font-weight:950}
+.paper-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.paper-form{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;align-items:end}
+.paper-table{min-width:920px}
+.paper-positive{color:var(--green);font-weight:850}
+.paper-negative{color:var(--red);font-weight:850}
+.status-pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900}
+.status-open{color:#8fd2ff;border:1px solid #2f6fa8;background:#071a2f}
+.status-stop{color:var(--red);border:1px solid #7d2d3d;background:#281018}
+.status-target{color:var(--green);border:1px solid #26734e;background:#09251a}
+.status-closed{color:#d0dae5;border:1px solid #4b647c;background:#101923}
+.paper-note{font-size:10.5px;color:#9fb4c8;line-height:1.48;margin-top:9px}
+.inline-actions{display:flex;gap:6px;flex-wrap:wrap}
+.inline-actions button{width:auto;padding:6px 8px;font-size:10px}
+@media(max-width:1000px){.paper-form{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.paper-form{grid-template-columns:1fr 1fr}}
+
+
+/* Running market ticker */
+.market-tape{
+  position:sticky;top:0;z-index:5000;
+  background:rgba(2,8,20,.97);
+  border-bottom:1px solid rgba(65,145,226,.45);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  backdrop-filter:blur(10px);
+  overflow:hidden;
+}
+.market-tape-head{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px 0;
+  color:#76baff;font-size:9px;font-weight:950;letter-spacing:1px;text-transform:uppercase
+}
+.market-tape-window{
+  overflow:hidden;white-space:nowrap;padding:10px 0 11px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 4%,black 96%,transparent);
+  mask-image:linear-gradient(90deg,transparent,black 4%,black 96%,transparent);
+}
+.market-tape-track{
+  display:inline-flex;align-items:center;gap:10px;
+  min-width:max-content;
+  animation:halifaxTicker 32s linear infinite;
+  will-change:transform;
+}
+.market-tape:hover .market-tape-track{animation-play-state:paused}
+.tape-item{
+  display:inline-flex;align-items:center;gap:8px;
+  border-right:1px solid #17385f;padding:0 12px 0 2px;
+  font-size:12px
+}
+.tape-symbol{font-weight:950;color:#eaf5ff}
+.tape-price{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#c9dff4;font-weight:800}
+.tape-up{color:var(--green);font-weight:900}
+.tape-down{color:var(--red);font-weight:900}
+.tape-flat{color:var(--yellow);font-weight:900}
+.tape-source{
+  margin-left:auto;color:#7895b1;font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:none
+}
+@keyframes halifaxTicker{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+@media (prefers-reduced-motion:reduce){
+  .market-tape-track{animation:none}
+  .market-tape-window{overflow-x:auto}
+}
+
 </style>
 </head>
 <body>
+
+<div class="market-tape" aria-label="Running market ticker">
+  <div class="market-tape-head">
+    <span>Market Tape</span>
+    <span class="info-dot" data-term="marketTicker">?</span>
+    <span class="tape-source" id="tapeSource">Demo educational prices</span>
+  </div>
+  <div class="market-tape-window">
+    <div class="market-tape-track" id="marketTapeTrack">
+      <div class="tape-item"><span class="tape-symbol">SPY</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
+      <div class="tape-item"><span class="tape-symbol">QQQ</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
+      <div class="tape-item"><span class="tape-symbol">NVDA</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
+      <div class="tape-item"><span class="tape-symbol">AAPL</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
+
+      <div class="tape-item"><span class="tape-symbol">SPY</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
+      <div class="tape-item"><span class="tape-symbol">QQQ</span><span class="tape-price">MARKET</span><span class="tape-flat">• READY</span></div>
+      <div class="tape-item"><span class="tape-symbol">NVDA</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
+      <div class="tape-item"><span class="tape-symbol">AAPL</span><span class="tape-price">DEMO</span><span class="tape-flat">• READY</span></div>
+</div>
+  </div>
+</div>
+
 <div class="container">
 
   <div class="card header">
@@ -157,9 +273,9 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
     <div class="card">
       <div class="section-title">What LONG / SHORT / WAIT means</div>
       <div class="list">
-        <div class="item"><b class="good">LONG</b> — You are looking for the stock to rise. The engine wants several bullish factors to agree before suggesting this direction.</div>
-        <div class="item"><b class="bad">SHORT</b> — You are looking for the stock to fall. Shorting can have losses greater than your initial sale proceeds if price rises sharply, so beginners should use extra caution.</div>
-        <div class="item"><b class="neutral">WAIT</b> — Evidence conflicts, data is weak, or the reward does not justify the risk. Doing nothing is often the correct trade decision.</div>
+        <div class="item"><b class="good"><span class="term" data-term="long">LONG</span></b> — You are looking for the stock to rise. The engine wants several bullish factors to agree before suggesting this direction.</div>
+        <div class="item"><b class="bad"><span class="term" data-term="short">SHORT</span></b> — You are looking for the stock to fall. Shorting can have losses greater than your initial sale proceeds if price rises sharply, so beginners should use extra caution.</div>
+        <div class="item"><b class="neutral"><span class="term" data-term="wait">WAIT</span></b> — Evidence conflicts, data is weak, or the reward does not justify the risk. Doing nothing is often the correct trade decision.</div>
       </div>
     </div>
   </div>
@@ -167,10 +283,10 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
   <div class="card">
     <div class="section-title">3 — Why the engine thinks that</div>
     <div id="factors" class="grid cols-4">
-      <div class="factor"><div class="name">Trend</div><div class="value neutral">—</div><div class="note">Price versus the 20- and 50-day averages.</div></div>
-      <div class="factor"><div class="name">Momentum</div><div class="value neutral">—</div><div class="note">RSI helps identify strength, weakness, or stretched moves.</div></div>
-      <div class="factor"><div class="name">Volume</div><div class="value neutral">—</div><div class="note">Higher-than-normal volume can strengthen a breakout or breakdown.</div></div>
-      <div class="factor"><div class="name">Structure</div><div class="value neutral">—</div><div class="note">Recent highs/lows help define breakout, support and invalidation.</div></div>
+      <div class="factor"><div class="name">Trend</div><div class="value neutral">—</div><div class="note">Price versus the <span class="term" data-term="movingAverage">20-day</span> and <span class="term" data-term="movingAverage">50-day moving averages</span>.</div></div>
+      <div class="factor"><div class="name">Momentum</div><div class="value neutral">—</div><div class="note"><span class="term" data-term="rsi">RSI</span> helps identify strength, weakness, or stretched moves.</div></div>
+      <div class="factor"><div class="name">Volume</div><div class="value neutral">—</div><div class="note">Higher-than-normal <span class="term" data-term="volume">volume</span> can strengthen a <span class="term" data-term="breakout">breakout</span> or <span class="term" data-term="breakdown">breakdown</span>.</div></div>
+      <div class="factor"><div class="name">Structure</div><div class="value neutral">—</div><div class="note">Recent highs/lows help define <span class="term" data-term="breakout">breakout</span>, support and invalidation.</div></div>
     </div>
   </div>
 
@@ -201,13 +317,13 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
     <div class="grid cols-2">
       <div class="list">
         <div class="item lesson-step"><div class="num">1</div><div><b>Start with the market.</b><br>Check broad indexes such as SPY and QQQ. Long setups are easier when the market is rising; short setups are easier when the market is weakening.</div></div>
-        <div class="item lesson-step"><div class="num">2</div><div><b>Look for liquid, widely followed stocks.</b><br>Beginners usually benefit from tighter spreads and plenty of trading volume rather than obscure low-volume names.</div></div>
-        <div class="item lesson-step"><div class="num">3</div><div><b>Look for a catalyst.</b><br>Earnings, guidance, major company news, analyst changes, sector news or macro events can create movement. Verify the source and date.</div></div>
+        <div class="item lesson-step"><div class="num">2</div><div><b>Look for <span class="term" data-term="liquidity">liquid</span>, widely followed stocks.</b><br>Beginners usually benefit from tighter spreads and plenty of trading volume rather than obscure low-volume names.</div></div>
+        <div class="item lesson-step"><div class="num">3</div><div><b>Look for a <span class="term" data-term="catalyst">catalyst</span>.</b><br><span class="term" data-term="earnings">Earnings</span>, <span class="term" data-term="guidance">guidance</span>, major company news, analyst changes, sector news or macro events can create movement. Verify the source and date.</div></div>
       </div>
       <div class="list">
-        <div class="item lesson-step"><div class="num">4</div><div><b>Check trend + level + volume.</b><br>A stronger setup often has a clear trend, a nearby support/resistance level and enough volume to confirm participation.</div></div>
-        <div class="item lesson-step"><div class="num">5</div><div><b>Wait for confirmation.</b><br>A setup is not the same as an entry. Price should behave the way your plan expected before you commit capital.</div></div>
-        <div class="item lesson-step"><div class="num">6</div><div><b>Skip bad reward/risk.</b><br>If the stop has to be very far away or the target is too close, WAIT rather than forcing a trade.</div></div>
+        <div class="item lesson-step"><div class="num">4</div><div><b>Check trend + level + volume.</b><br>A stronger setup often has a clear trend, a nearby <span class="term" data-term="supportResistance">support/resistance</span> level and enough volume to confirm participation.</div></div>
+        <div class="item lesson-step"><div class="num">5</div><div><b>Wait for <span class="term" data-term="confirmation">confirmation</span>.</b><br>A setup is not the same as an entry. Price should behave the way your plan expected before you commit capital.</div></div>
+        <div class="item lesson-step"><div class="num">6</div><div><b>Skip bad <span class="term" data-term="riskReward">reward/risk</span>.</b><br>If the stop has to be very far away or the target is too close, WAIT rather than forcing a trade.</div></div>
       </div>
     </div>
   </div>
@@ -219,6 +335,73 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
         <thead><tr><th>Ticker</th><th>Direction</th><th>Score</th><th>What to check next</th></tr></thead>
         <tbody id="ideaTable"><tr><td colspan="4">Press “Find Beginner Trade Ideas.” Demo mode ranks example setups for learning; live mode will analyze the ticker you request with verified API data.</td></tr></tbody>
       </table>
+    </div>
+  </div>
+
+
+  <div class="card" id="paperTrading">
+    <div class="paper-head">
+      <div>
+        <div class="section-title">6 — Paper Trading Practice</div>
+        <div class="subtitle">Practice setting up a trade, stop and target without using real money.</div>
+      </div>
+      <div>
+        <div class="paper-balance" id="paperEquity">$100,000.00</div>
+        <div class="paper-sub">Paper account equity</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin:12px 0">
+      A <span class="term" data-term="paperTrade">paper trade</span> is a simulated trade.
+      Use it to practice an <span class="term" data-term="entry">entry</span>,
+      <span class="term" data-term="stopLoss">stop-loss</span>,
+      <span class="term" data-term="profitTarget">profit target</span> and
+      <span class="term" data-term="positionSize">position size</span> before risking real money.
+    </div>
+
+    <div class="paper-form">
+      <div><label>Symbol <span class="info-dot" data-term="ticker">?</span></label><input id="paperTicker" value="NVDA" maxlength="8"></div>
+      <div><label>Direction <span class="info-dot" data-term="longShort">?</span></label>
+        <select id="paperDirection"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>
+      </div>
+      <div><label>Entry Price <span class="info-dot" data-term="entry">?</span></label><input id="paperEntry" type="number" step=".01" value="100"></div>
+      <div><label>Shares <span class="info-dot" data-term="positionSize">?</span></label><input id="paperQty" type="number" step="1" min="1" value="10"></div>
+      <div><label>Stop Price <span class="info-dot" data-term="stopLoss">?</span></label><input id="paperStop" type="number" step=".01" value="97"></div>
+      <div><label>Profit Target <span class="info-dot" data-term="profitTarget">?</span></label><input id="paperTarget" type="number" step=".01" value="106"></div>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:10px">
+      <button id="useAnalyzedPrice" class="secondary">Use Analyzed Trade Plan</button>
+      <button id="placePaperTrade" class="green">Place Paper Trade</button>
+      <button id="resetPaper" class="secondary">Reset Paper Account</button>
+    </div>
+
+    <hr>
+
+    <div class="grid cols-3">
+      <div><label>Simulated Current Price <span class="info-dot" data-term="markPrice">?</span></label><input id="paperMark" type="number" step=".01" value="100"></div>
+      <div style="align-self:end"><button id="updatePaperPrice">Update Price / Check Stops</button></div>
+      <div class="factor">
+        <div class="name">Open Risk <span class="info-dot" data-term="riskPerTrade">?</span></div>
+        <div class="value" id="paperOpenRisk">$0.00</div>
+        <div class="note">Total planned loss to stops across open paper positions.</div>
+      </div>
+    </div>
+
+    <div style="overflow:auto;margin-top:12px">
+      <table class="paper-table">
+        <thead>
+          <tr>
+            <th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Mark</th>
+            <th>Stop</th><th>Target</th><th>P/L <span class="info-dot" data-term="profitLoss">?</span></th>
+            <th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="paperPositions"></tbody>
+      </table>
+    </div>
+    <div class="paper-note">
+      Stops and targets trigger when you press “Update Price / Check Stops.” This is a training simulator and does not send orders to a broker.
     </div>
   </div>
 
@@ -300,6 +483,7 @@ async function loadLive(){
     };
     $("dataStatus").textContent=`Verified Alpha Vantage daily data • ${last.date}`;
     analyzeData(symbol,currentData);
+    $("tapeSource").textContent=`Analyzed ${symbol} verified • other tape symbols are demo`;
   }catch(err){
     currentData=null;
     $("dataStatus").textContent="I cannot confirm market data";
@@ -351,6 +535,7 @@ function scoreSetup(d){
 }
 
 function analyzeData(symbol,d){
+  updateTapeFromAnalysis(symbol,d);
   if(!d || !isFinite(d.price) || d.price<=0){setUnknown("I cannot confirm usable market data.");return;}
   const s=scoreSetup(d);
   $("signal").textContent=s.signal;
@@ -427,13 +612,316 @@ $("analyze").onclick=()=>{
 
 $("ideaBtn").onclick=()=>{
   const rows=Object.entries(demoSets).map(([t,d])=>({t,...scoreSetup(d)})).sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
-  $("ideaTable").innerHTML=rows.map(r=>`<tr><td><b>${r.t}</b></td><td><span class="chip ${r.signal.toLowerCase()}">${r.signal}</span></td><td>${r.score>0?"+":""}${r.score}</td><td>${r.signal==="LONG"?"Check for price confirmation above support / breakout level.":r.signal==="SHORT"?"Check for weakness below resistance / breakdown level.":"Skip for now; wait for cleaner agreement."}</td></tr>`).join("");
+  $("ideaTable").innerHTML=rows.map(r=>`<tr><td><b>${r.t}</b></td><td><span class="chip ${r.signal.toLowerCase()}">${r.signal}</td><td>${r.score>0?"+":""}${r.score}</td><td>${r.signal==="LONG"?"Check for price confirmation above support / breakout level.":r.signal==="SHORT"?"Check for weakness below resistance / breakdown level.":"Skip for now; wait for cleaner agreement."}</td></tr>`).join("");
   $("dataStatus").textContent="Idea Board uses clearly labeled demo data";
 };
 
 $("resetBtn").onclick=()=>location.reload();
 $("ticker").addEventListener("input",()=>{ currentData=null; });
+
+
+/* ---------- Running market ticker ---------- */
+const tapeDemo = [
+  {s:"SPY",p:645.20,c:.62},
+  {s:"QQQ",p:577.80,c:.91},
+  {s:"DIA",p:454.10,c:.28},
+  {s:"IWM",p:228.40,c:-.34},
+  {s:"NVDA",p:181.20,c:1.48},
+  {s:"AAPL",p:232.10,c:.37},
+  {s:"MSFT",p:516.20,c:-.18},
+  {s:"AMD",p:171.30,c:1.12},
+  {s:"TSLA",p:334.70,c:-1.26},
+  {s:"AMZN",p:230.50,c:.44},
+  {s:"META",p:756.20,c:.71},
+  {s:"GOOGL",p:212.90,c:-.22}
+];
+
+function renderMarketTape(items=tapeDemo, sourceText="Demo educational prices"){
+  const track=$("marketTapeTrack");
+  const row=items.map(x=>{
+    const cls=x.c>0?"tape-up":x.c<0?"tape-down":"tape-flat";
+    const arrow=x.c>0?"▲":x.c<0?"▼":"•";
+    return `<div class="tape-item">
+      <span class="tape-symbol">${x.s}</span>
+      <span class="tape-price">$${Number(x.p).toFixed(2)}</span>
+      <span class="${cls}">${arrow} ${Math.abs(Number(x.c)).toFixed(2)}%</span>
+    </div>`;
+  }).join("");
+  // Duplicate content creates a seamless marquee loop.
+  track.innerHTML=row+row;
+  $("tapeSource").textContent=sourceText;
+}
+
+function updateTapeFromAnalysis(symbol,d){
+  if(!d || !symbol) return;
+  const idx=tapeDemo.findIndex(x=>x.s===symbol);
+  const approximateChange = d.sma20 ? ((d.price-d.sma20)/d.sma20)*100 : 0;
+  const item={s:symbol,p:d.price,c:approximateChange};
+  let items=[...tapeDemo];
+  if(idx>=0) items[idx]=item; else items.unshift(item);
+  renderMarketTape(items,d.label && d.label.startsWith("LIVE") ? "Includes verified analyzed price • change vs 20-day average" : "Demo educational prices");
+}
+
+renderMarketTape();
 analyzeData("NVDA",demoSets.NVDA);
+
+/* ---------- Beginner term popups ---------- */
+const glossary = {
+
+  marketTicker:{title:"Running Market Ticker",body:"A market ticker is a scrolling display of symbols, prices and price changes. It gives you a quick snapshot of what major stocks or indexes are doing.",example:"SPY +0.8% means SPY is shown as up 0.8% versus the comparison price used by the data source."},
+  ticker:{title:"Ticker / Symbol",body:"The short code used to identify a stock or ETF on an exchange.",example:"Example: AAPL is Apple; SPY is an ETF that tracks the S&P 500."},
+  long:{title:"LONG",body:"A long trade is a trade where you want the price to rise after you enter.",example:"Buy at $50 and sell at $55 = $5 gain per share before fees and taxes."},
+  short:{title:"SHORT",body:"A short trade is a bearish trade where you borrow shares, sell them first, then hope to buy them back at a lower price. If price rises instead, losses can grow rapidly and are theoretically unlimited.",example:"Short at $50 and cover at $45 = $5 gain per share before borrow costs, fees and taxes."},
+  longShort:{title:"LONG vs SHORT",body:"LONG means you expect price to rise. SHORT means you expect price to fall. Short selling carries additional risks and may require margin approval from a broker.",example:"A beginner can practice both directions here using paper trades only."},
+  wait:{title:"WAIT",body:"WAIT means the setup does not have enough agreement or the trade is not attractive enough yet. Not trading is a valid risk-management decision.",example:"If trend is bullish but momentum and volume are weak, WAIT can be better than forcing a trade."},
+  entry:{title:"Entry Price",body:"The price where you plan to open the trade. The entry should be tied to a reason, not just a guess.",example:"A trader may enter after price confirms a breakout above resistance."},
+  stopLoss:{title:"Stop-Loss",body:"A stop-loss is a planned exit price used to limit a loss if the trade moves against you. In live markets, stop orders can fill at a worse price during gaps or fast moves.",example:"Long at $100 with a stop at $97 means planned risk is about $3 per share before slippage."},
+  profitTarget:{title:"Profit Target",body:"A price where you plan to take some or all profit if the trade works.",example:"If risk is $3 per share, a 2R target would aim for about $6 per share of potential reward."},
+  positionSize:{title:"Position Size",body:"The number of shares or contracts in the trade. Position size controls how many dollars you can lose if the stop is hit.",example:"If you can risk $100 and your stop is $2 away, a simple risk-based size is 50 shares."},
+  riskPerTrade:{title:"Risk Per Trade",body:"The maximum amount of account value you plan to lose if the stop is hit. Many traders define this before entering.",example:"1% of a $10,000 account is $100 of planned risk."},
+  riskReward:{title:"Reward / Risk",body:"A comparison of potential profit to planned loss. A 2:1 reward/risk setup aims to make $2 for every $1 risked.",example:"Entry $100, stop $97 = $3 risk. A 2R target is $106."},
+  rsi:{title:"RSI — Relative Strength Index",body:"RSI is a momentum indicator that usually ranges from 0 to 100. It measures the speed and magnitude of recent price changes. It is not a buy or sell signal by itself.",example:"An RSI near 60 can show positive momentum; above 70 can indicate a strong or stretched move."},
+  volume:{title:"Trading Volume",body:"Volume is the number of shares traded during a period. Higher-than-normal volume can show stronger participation, but it does not guarantee direction.",example:"A breakout on 1.5× normal volume can be more convincing than the same move on very light volume."},
+  movingAverage:{title:"Moving Average",body:"A moving average smooths price over a chosen number of periods. Traders compare price with moving averages to judge trend.",example:"Price above both the 20-day and 50-day averages can support a bullish trend reading."},
+  supportResistance:{title:"Support & Resistance",body:"Support is an area where buyers have previously stepped in. Resistance is an area where sellers have previously stopped or slowed price.",example:"A long trader may want support below the entry and a breakout through resistance above."},
+  breakout:{title:"Breakout",body:"A breakout happens when price pushes above an important resistance level or trading range.",example:"If a stock repeatedly stops at $50 and then closes above it with strong volume, traders may call that a breakout."},
+  breakdown:{title:"Breakdown",body:"A breakdown happens when price falls below an important support level or trading range.",example:"If support is $40 and price decisively falls below it, bearish traders may watch for continuation."},
+  catalyst:{title:"Catalyst",body:"A catalyst is an event or new information that may cause traders to reprice a stock.",example:"Earnings, guidance, an FDA decision, a major contract, or a macroeconomic report can be catalysts."},
+  earnings:{title:"Earnings",body:"A company's periodic report of revenue, profit and other financial results. Earnings can cause large price gaps.",example:"A stock can beat estimates and still fall if future guidance disappoints."},
+  guidance:{title:"Guidance",body:"Management's expectations or outlook for future revenue, profit, demand or other business measures.",example:"Raised guidance can support a bullish reaction; lowered guidance can pressure a stock."},
+  liquidity:{title:"Liquidity",body:"Liquidity describes how easily you can buy or sell without moving the price much. More liquid stocks often have tighter bid/ask spreads.",example:"A heavily traded large-cap stock is generally more liquid than a thinly traded micro-cap."},
+  confirmation:{title:"Confirmation",body:"Confirmation means waiting for price or volume to behave in a way that supports your original setup before entering.",example:"Instead of buying just below resistance, a trader might wait for price to move above it and hold."},
+  paperTrade:{title:"Paper Trade",body:"A paper trade is a simulated trade using pretend money. It is useful for learning order planning and reviewing decisions without putting real capital at risk.",example:"You can practice entering at $100, setting a $97 stop and a $106 target."},
+  markPrice:{title:"Mark / Current Price",body:"The price used to estimate the current value of an open position. In this simulator you enter it manually.",example:"If your long entry was $100 and the mark is $103, the unrealized gain is $3 per share."},
+  profitLoss:{title:"P/L — Profit and Loss",body:"P/L shows how much a position has gained or lost compared with its entry price. Open-position P/L is unrealized until the trade is closed.",example:"Long 10 shares from $100 with a current price of $103 = +$30 unrealized P/L."}
+};
+
+function openTerm(key){
+  const d=glossary[key];
+  if(!d) return;
+  $("termTitle").textContent=d.title;
+  $("termBody").innerHTML=`<div>${d.body}</div><div class="modal-example"><b>Example:</b> ${d.example}</div>`;
+  $("termModal").classList.add("open");
+  $("termModal").setAttribute("aria-hidden","false");
+}
+function closeTerm(){
+  $("termModal").classList.remove("open");
+  $("termModal").setAttribute("aria-hidden","true");
+}
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-term]");
+  if(el){e.preventDefault();openTerm(el.dataset.term);}
+});
+$("termClose").onclick=closeTerm;
+$("termModal").addEventListener("click",e=>{if(e.target===$("termModal")) closeTerm();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeTerm();});
+
+/* ---------- Paper trading ---------- */
+const PAPER_KEY="halifaxPaperAccountV2";
+let paper = JSON.parse(localStorage.getItem(PAPER_KEY) || "null") || {
+  startingCash:100000,
+  cash:100000,
+  positions:[],
+  history:[]
+};
+
+function savePaper(){localStorage.setItem(PAPER_KEY,JSON.stringify(paper));}
+function n2(x){return Number(x).toFixed(2);}
+function positionPL(p,mark){
+  const move=p.side==="LONG" ? (mark-p.entry) : (p.entry-mark);
+  return move*p.qty;
+}
+function plannedRisk(p){
+  if(p.side==="LONG") return Math.max(0,(p.entry-p.stop)*p.qty);
+  return Math.max(0,(p.stop-p.entry)*p.qty);
+}
+function currentEquity(){
+  let eq=paper.cash;
+  for(const p of paper.positions){
+    if(p.status==="OPEN"){
+      const mark=Number(p.mark||p.entry);
+      // Cash is not debited for simulated notionals; equity = starting cash + realized + unrealized
+      eq += positionPL(p,mark);
+    }
+  }
+  return eq;
+}
+function validatePaper(side,entry,stop,target,qty){
+  if(!entry||!stop||!target||!qty||entry<=0||stop<=0||target<=0||qty<=0) return "Enter valid positive numbers for entry, shares, stop and target.";
+  if(side==="LONG"){
+    if(!(stop<entry)) return "For a LONG trade, the stop should be below the entry.";
+    if(!(target>entry)) return "For a LONG trade, the profit target should be above the entry.";
+  }else{
+    if(!(stop>entry)) return "For a SHORT trade, the stop should be above the entry.";
+    if(!(target<entry)) return "For a SHORT trade, the profit target should be below the entry.";
+  }
+  return "";
+}
+function renderPaper(){
+  const body=$("paperPositions");
+  const open=paper.positions.filter(p=>p.status==="OPEN");
+  const closed=paper.history.slice().reverse();
+  const all=[...open,...closed];
+  if(!all.length){
+    body.innerHTML='<tr><td colspan="10">No paper trades yet. Set an entry, stop and target above, then place a simulated trade.</td></tr>';
+  }else{
+    body.innerHTML=all.map(p=>{
+      const mark=Number(p.mark||p.exit||p.entry);
+      const pl=p.status==="OPEN"?positionPL(p,mark):Number(p.realizedPL||0);
+      const cls=pl>0?"paper-positive":pl<0?"paper-negative":"";
+      const statusClass=p.status==="OPEN"?"status-open":p.status==="STOPPED"?"status-stop":p.status==="TARGET"?"status-target":"status-closed";
+      const action=p.status==="OPEN"
+        ? `<div class="inline-actions"><button onclick="paperClose('${p.id}')">Close</button><button class="secondary" onclick="paperLoad('${p.id}')">Edit Stop/Target</button></div>`
+        : "—";
+      return `<tr>
+        <td><b>${p.symbol}</b></td><td>${p.side}</td><td>${p.qty}</td><td>$${n2(p.entry)}</td><td>$${n2(mark)}</td>
+        <td>$${n2(p.stop)}</td><td>$${n2(p.target)}</td><td class="${cls}">${pl>=0?"+":""}$${n2(pl)}</td>
+        <td><span class="status-pill ${statusClass}">${p.status}</td><td>${action}</td>
+      </tr>`;
+    }).join("");
+  }
+  $("paperEquity").textContent="$"+currentEquity().toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  const risk=open.reduce((a,p)=>a+plannedRisk(p),0);
+  $("paperOpenRisk").textContent="$"+risk.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function checkTriggers(p,mark){
+  if(p.side==="LONG"){
+    if(mark<=p.stop) return "STOPPED";
+    if(mark>=p.target) return "TARGET";
+  }else{
+    if(mark>=p.stop) return "STOPPED";
+    if(mark<=p.target) return "TARGET";
+  }
+  return "OPEN";
+}
+function closePaperPosition(id,reason,exit){
+  const idx=paper.positions.findIndex(p=>p.id===id);
+  if(idx<0)return;
+  const p=paper.positions[idx];
+  p.exit=Number(exit);
+  p.mark=p.exit;
+  p.status=reason;
+  p.realizedPL=positionPL(p,p.exit);
+  p.closedAt=new Date().toISOString();
+  paper.cash += p.realizedPL;
+  paper.positions.splice(idx,1);
+  paper.history.push(p);
+  savePaper();renderPaper();
+}
+window.paperClose=function(id){
+  const p=paper.positions.find(x=>x.id===id);
+  if(!p)return;
+  const px=Number(prompt(`Close ${p.symbol} at what simulated price?`,p.mark||p.entry));
+  if(!isFinite(px)||px<=0)return;
+  closePaperPosition(id,"CLOSED",px);
+};
+window.paperLoad=function(id){
+  const p=paper.positions.find(x=>x.id===id);
+  if(!p)return;
+  $("paperTicker").value=p.symbol;
+  $("paperDirection").value=p.side;
+  $("paperEntry").value=p.entry;
+  $("paperQty").value=p.qty;
+  $("paperStop").value=p.stop;
+  $("paperTarget").value=p.target;
+  $("paperMark").value=p.mark||p.entry;
+  $("placePaperTrade").textContent="Save Stop / Target";
+  $("placePaperTrade").dataset.editId=id;
+  document.getElementById("paperTrading").scrollIntoView({behavior:"smooth"});
+};
+
+$("placePaperTrade").onclick=()=>{
+  const symbol=$("paperTicker").value.trim().toUpperCase();
+  const side=$("paperDirection").value;
+  const entry=+$("paperEntry").value, qty=Math.floor(+$("paperQty").value);
+  const stop=+$("paperStop").value, target=+$("paperTarget").value;
+  const err=validatePaper(side,entry,stop,target,qty);
+  if(err){alert(err);return;}
+  const editId=$("placePaperTrade").dataset.editId;
+  if(editId){
+    const p=paper.positions.find(x=>x.id===editId);
+    if(p){p.stop=stop;p.target=target;p.qty=qty;p.side=side;p.symbol=symbol;p.entry=entry;}
+    delete $("placePaperTrade").dataset.editId;
+    $("placePaperTrade").textContent="Place Paper Trade";
+  }else{
+    const risk=side==="LONG"?(entry-stop)*qty:(stop-entry)*qty;
+    const accountRisk=Math.max(0,+$("accountSize").value||10000)*(Math.max(.1,+$("riskPct").value||1)/100);
+    if(risk>accountRisk){
+      const ok=confirm(`This paper trade risks about $${n2(risk)}, above the current risk setting of about $${n2(accountRisk)}. Place it anyway for practice?`);
+      if(!ok)return;
+    }
+    paper.positions.push({
+      id:"p"+Date.now()+Math.random().toString(16).slice(2),
+      symbol,side,entry,qty,stop,target,mark:entry,status:"OPEN",openedAt:new Date().toISOString()
+    });
+  }
+  savePaper();renderPaper();
+};
+
+$("updatePaperPrice").onclick=()=>{
+  const symbol=$("paperTicker").value.trim().toUpperCase();
+  const mark=+$("paperMark").value;
+  if(!isFinite(mark)||mark<=0){alert("Enter a valid simulated current price.");return;}
+  const affected=paper.positions.filter(p=>p.status==="OPEN" && p.symbol===symbol);
+  if(!affected.length){alert(`No open paper position found for ${symbol}.`);return;}
+  // copy list because positions may close during iteration
+  for(const p of [...affected]){
+    p.mark=mark;
+    const trigger=checkTriggers(p,mark);
+    if(trigger!=="OPEN") closePaperPosition(p.id,trigger,mark);
+  }
+  savePaper();renderPaper();
+};
+
+$("useAnalyzedPrice").onclick=()=>{
+  const symbol=$("ticker").value.trim().toUpperCase();
+  const d=getData();
+  if(!d || !isFinite(d.price)){alert("Analyze a usable setup first.");return;}
+  const s=scoreSetup(d);
+  $("paperTicker").value=symbol;
+  $("paperDirection").value=s.signal==="SHORT"?"SHORT":"LONG";
+  $("paperEntry").value=n2(d.price);
+  if(s.signal==="SHORT"){
+    const stop=Math.max(d.sma20,d.price*1.03);
+    const risk=stop-d.price;
+    $("paperStop").value=n2(stop);
+    $("paperTarget").value=n2(d.price-2*risk);
+  }else{
+    const stop=Math.min(d.sma20,d.price*.97);
+    const risk=d.price-stop;
+    $("paperStop").value=n2(stop);
+    $("paperTarget").value=n2(d.price+2*risk);
+  }
+  $("paperMark").value=n2(d.price);
+  const acct=Math.max(0,+$("accountSize").value||0);
+  const rp=Math.max(.1,+$("riskPct").value||1);
+  const riskDollars=acct*(rp/100);
+  const riskPerShare=Math.abs(+$("paperEntry").value-(+$("paperStop").value));
+  $("paperQty").value=Math.max(1,Math.floor(riskDollars/Math.max(.01,riskPerShare)));
+};
+
+$("resetPaper").onclick=()=>{
+  if(!confirm("Reset the paper account to $100,000 and erase all simulated trades?"))return;
+  paper={startingCash:100000,cash:100000,positions:[],history:[]};
+  savePaper();renderPaper();
+};
+
+renderPaper();
+
 </script>
+
+<div class="modal-backdrop" id="termModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="termTitle">
+    <div class="modal-head">
+      <div>
+        <div class="kicker">Beginner Definition</div>
+        <h3 id="termTitle">Term</h3>
+      </div>
+      <button class="modal-close" id="termClose">Close</button>
+    </div>
+    <div class="modal-body" id="termBody"></div>
+  </div>
+</div>
+
 </body>
 </html>
